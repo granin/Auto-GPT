@@ -95,6 +95,11 @@ def create_chat_completion(
     for attempt in range(num_retries):
         backoff = 2 ** (attempt + 2)
         try:
+            api_key = CFG.openai_api_key
+            if model == "gpt-4":
+                api_key = os.environ.get("OPENAI_API_KEY_SMART", CFG.openai_api_key)
+
+            openai.api_key = api_key
             if CFG.use_azure:
                 response = openai.ChatCompletion.create(
                     deployment_id=CFG.get_azure_deployment_id_for_model(model),
@@ -110,6 +115,7 @@ def create_chat_completion(
                     temperature=temperature,
                     max_tokens=max_tokens,
                 )
+            openai.api_key = CFG.openai_api_key
             break
         except RateLimitError:
             if CFG.debug_mode:
