@@ -1,9 +1,10 @@
 
-# agent.py
+# Auto-GPT/autogpt/agent/agent.py
 # ABOT Capture the assistant_reply content
-from cli_components.content_capturer import capture_content, write_captured_content_to_file
-
+from ..cli_components.capture_utils import capture_content
 from colorama import Fore, Style
+
+
 
 from autogpt.app import execute_command, get_command
 from autogpt.chat import chat_with_ai, create_chat_message
