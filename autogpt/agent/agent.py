@@ -1,3 +1,8 @@
+
+# agent.py
+# ABOT Capture the assistant_reply content
+from cli_components.content_capturer import capture_content, write_captured_content_to_file
+
 from colorama import Fore, Style
 
 from autogpt.app import execute_command, get_command
@@ -91,6 +96,8 @@ class Agent:
                     self.memory,
                     cfg.fast_token_limit,
                 )  # TODO: This hardcodes the model to use GPT3.5. Make this an argument
+            # ABOT Capture the assistant_reply content
+            capture_content("Assistant Reply", assistant_reply)
 
             assistant_reply_json = fix_json_using_multiple_techniques(assistant_reply)
             for plugin in cfg.plugins:
