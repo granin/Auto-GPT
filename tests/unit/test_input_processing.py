@@ -1,9 +1,9 @@
 
 # tests/unit/test_input_processing.py - Contains unit tests for the process_input function in the input_processing module.
 
-
 import unittest
-from custom.input_processing import process_input
+
+from cli_components.input_processing import process_input
 
 
 class TestInputProcessing(unittest.TestCase):

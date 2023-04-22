@@ -1,3 +1,4 @@
+
 # cli_components/input_capture.py - Demonstrates the use of the input_processing module for capturing user input.cli_components/input_capture.py - Demonstrates the use of the input_processing module for capturing user input.
 
 from input_processing import process_input
