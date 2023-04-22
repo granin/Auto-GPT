@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+User -> Setup.py: Enter AI Name, Role, and Goals
+Setup.py -> AIConfig: Create AIConfig object
+
+User -> Agent.py: Initiate conversation with AI
+Agent.py -> GPT4: Send user input and receive AI response
+Agent.py <- GPT4: AI response
+
+User <- Agent.py: Display AI response
+@enduml
+
