@@ -1,7 +1,18 @@
+
+# capture_utils.py
 from typing import List
 from telegram import Update
 
 _capture_buffer: List[str] = []
+def check_file_for_y(file_path):
+    try:
+        with open(file_path, "r") as f:
+            content = f.read().strip().lower()
+            if content == "y":
+                return True
+    except FileNotFoundError:
+        pass
+    return False
 
 def pretty_print_nested_dict(nested_dict):
     output = []

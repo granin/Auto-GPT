@@ -2,6 +2,9 @@
 # Auto-GPT/autogpt/agent/agent.py
 # ABOT Capture the assistant_reply content
 from ..cli_components.capture_utils import capture_content, write_captured_content_to_file
+from autogpt.cli_components.capture_utils import check_file_for_y
+import os
+
 
 from colorama import Fore, Style
 
@@ -138,10 +141,21 @@ class Agent:
                     f"{self.ai_name}...",
                     flush=True,
                 )
+
+
+                # Get the absolute path of the file you want to write the processed input to
+                # input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
+                input_filename = '/Users/m/git/1ai/Auto-GPT/Processed_Input.txt'
+                # input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
+                file_path = input_filename
+
                 while True:
-                    console_input = clean_input(
-                        Fore.MAGENTA + "Input:" + Style.RESET_ALL
-                    )
+                    if check_file_for_y(file_path):
+                        console_input = "y"
+                    else:
+                        console_input = clean_input(
+                            Fore.MAGENTA + "Input:" + Style.RESET_ALL
+                        )
                     if console_input.lower().strip() == "y":
                         user_input = "GENERATE NEXT COMMAND JSON"
                         break
