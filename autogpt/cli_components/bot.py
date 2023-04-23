@@ -1,11 +1,14 @@
 import os
 import time
+from input_processing import process_input  # Add this line to import the function
 
 def get_file_mtime(filename):
     return os.stat(filename).st_mtime
 
 def main():
-    filename = "Assistant_Reply.txt"
+    # Get the absolute path of the Assistant_Reply.txt file
+    filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
+
     last_mtime = None
     last_content = None
 
@@ -21,6 +24,14 @@ def main():
                             print(f"File updated: {content}")
                             last_content = content
                             last_mtime = current_mtime
+
+                            try:
+                                user_input = input("Please enter some text: ")
+                                processed_input = process_input(user_input)
+                                print(f"Processed input: {processed_input}")
+                            except KeyboardInterrupt:
+                                print("Stopping input capture.")
+                                break
             else:
                 last_mtime = None
 
