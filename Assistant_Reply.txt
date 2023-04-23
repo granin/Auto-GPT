@@ -1,0 +1,30 @@
+{
+    "thoughts": {
+        "text": "I will start by searching for files in the Downloads directory using the 'search_files' command.",
+        "reasoning": "I need to find the files that have the same name but different extensions, so I can move them to folders with the same name as the filename itself without extension.",
+        "plan": "- Use the 'search_files' command to find all files in the Downloads directory.\n- Loop through the list of files and check if there are any files with the same name but different extensions.\n- If there are, create a folder with the same name as the filename without extension and move the files to that folder.\n- If there are no multiple files with the same name, do not move the file.",
+        "criticism": "I need to make sure that I am checking for files with the same name but different extensions correctly, and that I am not moving files that should not be moved.",
+        "speak": "I will use the 'search_files' command to find all files in the Downloads directory, and then loop through the list of files to check for files with the same name but different extensions. If there are any, I will create a folder with the same name as the filename without extension and move the files to that folder. If there are no multiple files with the same name, I will not move the file."
+    },
+    "command": {
+        "name": "search_files",
+        "args": {
+            "directory": "~/Downloads"
+        }
+    }
+}
+{
+    "thoughts": {
+        "text": "I will start by searching for files in the Downloads directory using the 'search_files' command.",
+        "reasoning": "I need to find the files that have the same name but different extensions, so I can move them to folders with the same name as the filename itself without extension.",
+        "plan": "- Use the 'search_files' command to find all files in the Downloads directory.\n- Loop through the list of files and check if there are any files with the same name but different extensions.\n- If there are, create a folder with the same name as the filename without extension and move the files to that folder.\n- If there are no multiple files with the same name, do not move the file.",
+        "criticism": "I need to make sure that I am checking for files with the same name but different extensions correctly, and that I am not moving files that should not be moved.",
+        "speak": "I will use the 'search_files' command to find all files in the Downloads directory, and then loop through the list of files to check for files with the same name but different extensions. If there are any, I will create a folder with the same name as the filename without extension and move the files to that folder. If there are no multiple files with the same name, I will not move the file."
+    },
+    "command": {
+        "name": "search_files",
+        "args": {
+            "directory": "~/Downloads"
+        }
+    }
+}
