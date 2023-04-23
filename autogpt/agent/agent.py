@@ -1,7 +1,8 @@
 
 # Auto-GPT/autogpt/agent/agent.py
 # ABOT Capture the assistant_reply content
-from ..cli_components.capture_utils import capture_content
+from ..cli_components.capture_utils import capture_content, write_captured_content_to_file
+
 from colorama import Fore, Style
 
 
@@ -97,14 +98,16 @@ class Agent:
                     self.memory,
                     cfg.fast_token_limit,
                 )  # TODO: This hardcodes the model to use GPT3.5. Make this an argument
-            # ABOT Capture the assistant_reply content
-            capture_content("Assistant Reply", assistant_reply)
+
 
             assistant_reply_json = fix_json_using_multiple_techniques(assistant_reply)
             for plugin in cfg.plugins:
                 if not plugin.can_handle_post_planning():
                     continue
                 assistant_reply_json = plugin.post_planning(self, assistant_reply_json)
+            # ABOT Capture the assistant_reply content
+            capture_content("Assistant Reply", assistant_reply)
+            write_captured_content_to_file("Assistant_Reply.txt")  #
 
             # Print Assistant thoughts
             if assistant_reply_json != {}:

@@ -7,6 +7,7 @@ from autogpt.config import Config
 from autogpt.llm_utils import create_chat_completion
 from autogpt.logs import logger
 from autogpt.types.openai import Message
+from autogpt.cli_components.capture_utils import capture_content
 
 cfg = Config()
 
@@ -181,6 +182,7 @@ def chat_with_ai(
                 messages=current_context,
                 max_tokens=tokens_remaining,
             )
+            capture_content("Assistant Reply", assistant_reply)
 
             # Update full message history
             full_message_history.append(create_chat_message("user", user_input))
