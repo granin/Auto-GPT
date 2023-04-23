@@ -106,8 +106,9 @@ class Agent:
                     continue
                 assistant_reply_json = plugin.post_planning(self, assistant_reply_json)
             # ABOT Capture the assistant_reply content
-            capture_content("Assistant Reply", assistant_reply)
-            write_captured_content_to_file("Assistant_Reply.txt")  #
+            capture_content("Assistant Reply", assistant_reply_json, None, "Assistant_Reply.txt")
+
+            # write_captured_content_to_file()  #
 
             # Print Assistant thoughts
             if assistant_reply_json != {}:

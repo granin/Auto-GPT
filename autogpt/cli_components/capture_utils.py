@@ -23,11 +23,11 @@ def capture_content(title, content, update: Update = None, file_path: str = None
         content = ""
     _capture_buffer.append(content)
 
-    # Add this block to send the content immediately
-    if update:
-        send_captured_content(update)
+    # send the content immediately
+    # if update:
+    #     send_captured_content(update)
 
-    # Add this block to save the content to a file
+    # save the content to a file
     if file_path:
         write_captured_content_to_file(file_path)
 

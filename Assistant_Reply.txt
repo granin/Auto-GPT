@@ -1,10 +1,10 @@
 {
     "thoughts": {
         "text": "I will start by searching for files in the Downloads directory using the 'search_files' command.",
-        "reasoning": "I need to find the files that have the same name but different extensions, so I can move them to folders with the same name as the filename itself without extension.",
-        "plan": "- Use the 'search_files' command to find all files in the Downloads directory.\n- Loop through the list of files and check if there are any files with the same name but different extensions.\n- If there are, create a folder with the same name as the filename without extension and move the files to that folder.\n- If there are no multiple files with the same name, do not move the file.",
-        "criticism": "I need to make sure that I am checking for files with the same name but different extensions correctly, and that I am not moving files that should not be moved.",
-        "speak": "I will use the 'search_files' command to find all files in the Downloads directory, and then loop through the list of files to check for files with the same name but different extensions. If there are any, I will create a folder with the same name as the filename without extension and move the files to that folder. If there are no multiple files with the same name, I will not move the file."
+        "reasoning": "I need to locate the files that I want to move, and the Downloads directory is the most likely place to find them.",
+        "plan": "- Use the 'search_files' command to locate files in the Downloads directory\n- Filter the results to only include files with multiple extensions\n- Move the files to folders with the same name as the file without extension",
+        "criticism": "I need to make sure that I am only moving files with multiple extensions, and not single files. I also need to be careful to not overwrite any existing folders with the same name as the file without extension.",
+        "speak": "I will use the 'search_files' command to locate files in the Downloads directory, filter the results to only include files with multiple extensions, and move them to folders with the same name as the file without extension."
     },
     "command": {
         "name": "search_files",
@@ -13,13 +13,22 @@
         }
     }
 }
+thoughts: text: I will start by searching for files in the Downloads directory using the 'search_files' command.
+reasoning: I need to locate the files that I want to move, and the Downloads directory is the most likely place to find them.
+plan: - Use the 'search_files' command to locate files in the Downloads directory
+- Filter the results to only include files with multiple extensions
+- Move the files to folders with the same name as the file without extension
+criticism: I need to make sure that I am only moving files with multiple extensions, and not single files. I also need to be careful to not overwrite any existing folders with the same name as the file without extension.
+speak: I will use the 'search_files' command to locate files in the Downloads directory, filter the results to only include files with multiple extensions, and move them to folders with the same name as the file without extension.
+command: name: search_files
+args: directory: ~/Downloads
 {
     "thoughts": {
-        "text": "I will start by searching for files in the Downloads directory using the 'search_files' command.",
-        "reasoning": "I need to find the files that have the same name but different extensions, so I can move them to folders with the same name as the filename itself without extension.",
-        "plan": "- Use the 'search_files' command to find all files in the Downloads directory.\n- Loop through the list of files and check if there are any files with the same name but different extensions.\n- If there are, create a folder with the same name as the filename without extension and move the files to that folder.\n- If there are no multiple files with the same name, do not move the file.",
-        "criticism": "I need to make sure that I am checking for files with the same name but different extensions correctly, and that I am not moving files that should not be moved.",
-        "speak": "I will use the 'search_files' command to find all files in the Downloads directory, and then loop through the list of files to check for files with the same name but different extensions. If there are any, I will create a folder with the same name as the filename without extension and move the files to that folder. If there are no multiple files with the same name, I will not move the file."
+        "text": "It seems that there are no files with multiple extensions in the Downloads directory. I will need to modify my plan to include searching for files with a single extension as well.",
+        "reasoning": "If there are no files with multiple extensions, then I will need to include files with a single extension in my search to ensure that I am not missing any files that need to be moved.",
+        "plan": "- Use the 'search_files' command to locate files in the Downloads directory\n- Filter the results to include files with multiple extensions or a single extension\n- Move the files to folders with the same name as the file without extension",
+        "criticism": "I need to make sure that I am only moving files with multiple extensions or a single extension, and not directories or other types of files. I also need to be careful to not overwrite any existing folders with the same name as the file without extension.",
+        "speak": "I will use the 'search_files' command to locate files in the Downloads directory, filter the results to include files with multiple extensions or a single extension, and move them to folders with the same name as the file without extension."
     },
     "command": {
         "name": "search_files",
@@ -28,3 +37,12 @@
         }
     }
 }
+thoughts: text: It seems that there are no files with multiple extensions in the Downloads directory. I will need to modify my plan to include searching for files with a single extension as well.
+reasoning: If there are no files with multiple extensions, then I will need to include files with a single extension in my search to ensure that I am not missing any files that need to be moved.
+plan: - Use the 'search_files' command to locate files in the Downloads directory
+- Filter the results to include files with multiple extensions or a single extension
+- Move the files to folders with the same name as the file without extension
+criticism: I need to make sure that I am only moving files with multiple extensions or a single extension, and not directories or other types of files. I also need to be careful to not overwrite any existing folders with the same name as the file without extension.
+speak: I will use the 'search_files' command to locate files in the Downloads directory, filter the results to include files with multiple extensions or a single extension, and move them to folders with the same name as the file without extension.
+command: name: search_files
+args: directory: ~/Downloads
