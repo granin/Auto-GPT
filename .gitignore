@@ -1,4 +1,5 @@
 ## Original ignores
+Auto-GPT/Assistant_Reply.txt
 autogpt/keys.py
 autogpt/*json
 autogpt/node_modules/

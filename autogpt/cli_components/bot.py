@@ -1,6 +1,6 @@
 import os
 import time
-from input_processing import process_input  # Add this line to import the function
+from input_processing import process_input
 
 def get_file_mtime(filename):
     return os.stat(filename).st_mtime
@@ -8,6 +8,9 @@ def get_file_mtime(filename):
 def main():
     # Get the absolute path of the Assistant_Reply.txt file
     filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
+
+    # Get the absolute path of the file you want to write the processed input to
+    input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
 
     last_mtime = None
     last_content = None
@@ -28,7 +31,11 @@ def main():
                             try:
                                 user_input = input("Please enter some text: ")
                                 processed_input = process_input(user_input)
-                                print(f"Processed input: {processed_input}")
+
+                                # Write processed_input to the input_filename
+                                with open(input_filename, "w") as input_file:
+                                    input_file.write(processed_input)
+
                             except KeyboardInterrupt:
                                 print("Stopping input capture.")
                                 break
