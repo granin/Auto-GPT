@@ -13,7 +13,7 @@ def main():
     input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
 
     last_mtime = None
-    last_content = None
+    last_line_number = 0
 
     while True:
         try:
@@ -22,10 +22,12 @@ def main():
 
                 if last_mtime is None or current_mtime != last_mtime:
                     with open(filename, "r") as f:
-                        content = f.read()
-                        if content != last_content:
-                            print(f"File updated: {content}")
-                            last_content = content
+                        content = f.readlines()
+
+                        if len(content) > last_line_number:
+                            new_content = content[last_line_number:]
+                            print(f"New content: {''.join(new_content)}")
+                            last_line_number = len(content)
                             last_mtime = current_mtime
 
                             try:

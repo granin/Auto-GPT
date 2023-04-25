@@ -2,8 +2,11 @@
 # Auto-GPT/autogpt/agent/agent.py
 # ABOT Capture the assistant_reply content
 from ..cli_components.capture_utils import capture_content, write_captured_content_to_file
-from autogpt.cli_components.capture_utils import check_file_for_y
+from autogpt.cli_components.capture_utils import check_file_for_y, delete_file
 import os
+import time
+
+
 
 
 from colorama import Fore, Style
@@ -150,38 +153,52 @@ class Agent:
                 file_path = input_filename
 
                 while True:
-                    if check_file_for_y(file_path):
-                        console_input = "y"
-                    else:
-                        console_input = clean_input(
-                            Fore.MAGENTA + "Input:" + Style.RESET_ALL
-                        )
-                    if console_input.lower().strip() == "y":
-                        user_input = "GENERATE NEXT COMMAND JSON"
+                    console_input = check_file_for_y(file_path)
+                    if console_input == "y":
                         break
-                    elif console_input.lower().strip() == "":
-                        print("Invalid input format.")
-                        continue
-                    elif console_input.lower().startswith("y -"):
-                        try:
-                            self.next_action_count = abs(
-                                int(console_input.split(" ")[1])
-                            )
-                            user_input = "GENERATE NEXT COMMAND JSON"
-                        except ValueError:
-                            print(
-                                "Invalid input format. Please enter 'y -n' where n is"
-                                " the number of continuous tasks."
-                            )
-                            continue
-                        break
-                    elif console_input.lower() == "n":
+                    elif console_input == "n":
                         user_input = "EXIT"
                         break
                     else:
-                        user_input = console_input
-                        command_name = "human_feedback"
-                        break
+                        time.sleep(1)  # <-- Add the time module here
+                delete_file(file_path)
+
+# while True:
+#                     if check_file_for_y(file_path):
+#                         console_input = "y"
+#                         break
+#                     else:
+#                         time.sleep(1)  # <-- Add the time module here
+#                         else:
+#                         console_input = clean_input(
+#                             Fore.MAGENTA + "Input:" + Style.RESET_ALL
+#                         )
+#                     if console_input.lower().strip() == "y":
+#                         user_input = "GENERATE NEXT COMMAND JSON"
+#                         break
+#                     elif console_input.lower().strip() == "":
+#                         print("Invalid input format.")
+#                         continue
+#                     elif console_input.lower().startswith("y -"):
+#                         try:
+#                             self.next_action_count = abs(
+#                                 int(console_input.split(" ")[1])
+#                             )
+#                             user_input = "GENERATE NEXT COMMAND JSON"
+#                         except ValueError:
+#                             print(
+#                                 "Invalid input format. Please enter 'y -n' where n is"
+#                                 " the number of continuous tasks."
+#                             )
+#                             continue
+#
+#                     elif console_input.lower() == "n":
+#                         user_input = "EXIT"
+#                         break
+#                     else:
+#                         user_input = console_input
+#                         command_name = "human_feedback"
+#                         break
 
                 if user_input == "GENERATE NEXT COMMAND JSON":
                     logger.typewriter_log(
