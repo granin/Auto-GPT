@@ -1,6 +1,6 @@
 
 
-# Auto-GPT/autogpt/cli_components/bot.py
+# Auto-GPT/autogpt/bot/bot.py
 import os
 import time
 import datetime

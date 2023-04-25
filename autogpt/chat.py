@@ -7,7 +7,7 @@ from autogpt.config import Config
 from autogpt.llm_utils import create_chat_completion
 from autogpt.logs import logger
 from autogpt.types.openai import Message
-from autogpt.cli_components.capture_utils import capture_content
+from autogpt.bot.capture_utils import capture_content
 
 cfg = Config()
 

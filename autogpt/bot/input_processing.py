@@ -1,5 +1,5 @@
 
-# cli_components/input_processing.py
+# bot/input_processing.py
 
 def process_input(user_input):
     # Sanitize and prepare the input for further processing

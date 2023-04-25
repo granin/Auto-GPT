@@ -1,8 +1,8 @@
 
 # Auto-GPT/autogpt/agent/agent.py
 # ABOT Capture the assistant_reply content
-from ..cli_components.capture_utils import capture_content, write_captured_content_to_file
-from autogpt.cli_components.capture_utils import check_file_for_y, delete_file
+from ..bot.capture_utils import capture_content, write_captured_content_to_file
+from autogpt.bot.capture_utils import check_file_for_y, delete_file
 import os
 import time
 

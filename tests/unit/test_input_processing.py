@@ -3,7 +3,7 @@
 
 import unittest
 
-from cli_components.input_processing import process_input
+from bot.input_processing import process_input
 
 
 class TestInputProcessing(unittest.TestCase):
