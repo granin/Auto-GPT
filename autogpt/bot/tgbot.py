@@ -1,43 +1,56 @@
-import os
-import datetime
-from telegram import Update, ForceReply
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
+from bot import run_bot
 from input_processing import process_input
+import threading
 
-# Add the start function
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Hi! I am your GPT-4 Assistant. Ask me anything!")
+def on_output_file_updated(content):
+    global chat_id, bot_instance
+    if chat_id:
+        bot_instance.send_message(chat_id=chat_id, text=f"File updated: {content}")
+    return True
 
-# Add the help_command function
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Ask me anything! Just type your question and I'll try to help.")
+def get_user_input():
+    return "y"  # This will be replaced by the Telegram command
 
-# Add this function to handle user input via Telegram
-async def ask(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_input = update.message.text
-    if user_input.strip() != "":
-        processed_input = process_input(user_input)
-        await update.message.reply_text(processed_input)
-    else:
-        await update.message.reply_text("Please enter some text.")
+def on_exit():
+    print("Stopped monitoring file.")
 
+def monitor_bot():
+    output_filename = 'Assistant_Reply.txt'
+    input_filename = 'Processed_Input.txt'
 
-# Replace your original main() function with this one
-def main() -> None:
-    application = Application.builder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
+    run_bot(output_filename, input_filename, on_output_file_updated, get_user_input, process_input, on_exit)
 
-    # Add command handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
+def start(update: Update, context: CallbackContext) -> None:
+    global chat_id
+    chat_id = update.message.chat_id
+    update.message.reply_text('Monitoring started')
 
-    # Add the 'ask' command
-    application.add_handler(CommandHandler("ask", ask))
+def agree(update: Update, context: CallbackContext) -> None:
+    with open("Processed_Input.txt", "w") as input_file:
+        input_file.write("y")
+    update.message.reply_text('Agreed to continue')
 
-    # Add a message handler for non-command text messages
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, ask))
+TOKEN = "6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ"
+chat_id = None
+bot_instance = None
 
-    # Run the bot until the user presses Ctrl-C
-    application.run_polling()
+def main():
+    global bot_instance
+    updater = Updater(TOKEN)
+
+    bot_instance = updater.bot
+
+    updater.dispatcher.add_handler(CommandHandler("start", start))
+    updater.dispatcher.add_handler(CommandHandler("agree", agree))
+
+    updater.start_polling()
+
+    monitor_thread = threading.Thread(target=monitor_bot)
+    monitor_thread.start()
+
+    updater.idle()
 
 if __name__ == "__main__":
     main()
