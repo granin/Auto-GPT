@@ -5,6 +5,7 @@ from ..bot.capture_utils import capture_content, write_captured_content_to_file
 from autogpt.bot.capture_utils import check_file_for_y, delete_file
 import os
 import time
+import json
 
 
 
@@ -111,8 +112,9 @@ class Agent:
                 if not plugin.can_handle_post_planning():
                     continue
                 assistant_reply_json = plugin.post_planning(self, assistant_reply_json)
-            # ABOT Capture the assistant_reply content
-            capture_content("Assistant Reply", assistant_reply_json, None, "Assistant_Reply.txt")
+            # Save the JSON part of the assistant_reply content to a file
+            with open("Assistant_Reply.txt", "w") as f:
+                json.dump(assistant_reply_json, f, indent=2)
 
             # write_captured_content_to_file()  #
 
