@@ -1,6 +1,6 @@
 import os
 from bot import run_bot
-from input_processing import process_input
+from input_capture import process_input
 import datetime
 def on_output_file_updated(content):
     print(f"File updated: {content}")

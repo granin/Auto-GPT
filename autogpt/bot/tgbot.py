@@ -6,7 +6,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import asyncio
 
-from capture_utils import echo  # Add this import
+from capture_utils import get_human_feedback
 from bot import get_file_mtime, rename_old_session_files  # Add this import
 
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
@@ -128,6 +128,7 @@ app.add_handler(CommandHandler("agree", agree))
 app.add_handler(CommandHandler("disagree", disagree))
 app.add_handler(CommandHandler("run_continuous_commands", run_continuous_commands))
 app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, get_human_feedback))
+
 
 app.run_polling()

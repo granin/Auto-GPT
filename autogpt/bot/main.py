@@ -2,7 +2,7 @@
 
 # bot/main.py - Demonstrates the use of the input_processing module in a main application.cli_components/main.py - Demonstrates the use of the input_processing module in a main application.
 
-from input_processing import process_input
+from input_capture import process_input
 
 def main():
     user_input = input("Enter some text: ")

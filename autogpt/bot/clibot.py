@@ -5,7 +5,7 @@
 import os
 import time
 import datetime
-from input_processing import process_input
+from input_capture import process_input
 
 def get_file_mtime(filename):
     return os.stat(filename).st_mtime

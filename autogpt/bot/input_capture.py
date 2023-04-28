@@ -1,7 +1,7 @@
 
 # bot/input_capture.py - Demonstrates the use of the input_processing module for capturing user input.bot/input_capture.py - Demonstrates the use of the input_processing module for capturing user input.
 
-from input_processing import process_input
+from input_capture import process_input
 
 def main():
     user_input = input("Please enter some text: ")
@@ -9,6 +9,10 @@ def main():
     print(f"Processed input: {processed_input}")
 
 
+def process_input(user_input):
+    # Sanitize and prepare the input for further processing
+    sanitized_input = user_input.strip()
+    return sanitized_input
 
 def write_captured_content_to_file(file_path):
     content = get_content()

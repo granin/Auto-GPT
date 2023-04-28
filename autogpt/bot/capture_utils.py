@@ -30,11 +30,10 @@ def save_and_print_user_input(user_input):
         f.write(user_input)
     print(f"User input saved: {user_input}")
 
-async def echo(update: Update, context) -> None:
-    """Echo the user message."""
+async def get_human_feedback(update: Update, context) -> None:
+    """Get human feedback."""
     user_input = update.message.text
     save_and_print_user_input(user_input)
-
 def pretty_print_nested_dict(nested_dict):
     output = []
     for key, value in nested_dict.items():
