@@ -1,5 +1,3 @@
-
-
 # bot.py
 
 import os

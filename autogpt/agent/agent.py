@@ -153,7 +153,6 @@ class Agent:
                 input_filename = '/Users/m/git/1ai/Auto-GPT/Processed_Input.txt'
                 # input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
                 file_path = input_filename
-
                 while True:
                     console_input = check_file_for_y(file_path)
                     if console_input == "y":
@@ -162,7 +161,17 @@ class Agent:
                         user_input = "EXIT"
                         break
                     else:
-                        time.sleep(1)  # <-- Add the time module here
+                        if not os.path.exists(file_path):
+                            with open(file_path, 'w') as f:
+                                pass
+
+                        with open(file_path, 'r') as f:
+                            user_input = f.read().strip()
+
+                        if user_input:
+                            break
+                        else:
+                            time.sleep(1)
                 delete_file(file_path)
 
 # while True:
