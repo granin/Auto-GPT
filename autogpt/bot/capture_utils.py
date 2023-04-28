@@ -1,4 +1,6 @@
 
+
+
 # capture_utils.py
 from typing import List
 from telegram import Update
@@ -22,6 +24,16 @@ def delete_file(file_path):
     except FileNotFoundError:
         pass
 
+def save_and_print_user_input(user_input):
+    input_filename = "/Users/m/git/1ai/Auto-GPT/Processed_Input.txt"
+    with open(input_filename, "w") as f:
+        f.write(user_input)
+    print(f"User input saved: {user_input}")
+
+async def echo(update: Update, context) -> None:
+    """Echo the user message."""
+    user_input = update.message.text
+    save_and_print_user_input(user_input)
 
 def pretty_print_nested_dict(nested_dict):
     output = []

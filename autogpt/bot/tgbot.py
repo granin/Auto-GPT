@@ -3,8 +3,12 @@ import time
 import threading
 import datetime
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import asyncio
+
+from capture_utils import echo  # Add this import
+
+
 
 
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
@@ -136,11 +140,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     monitor_thread.start()
 
 
-app = ApplicationBuilder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
+app = Application.builder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
 app.add_handler(CommandHandler("hello", hello))
 app.add_handler(CommandHandler("2", two_steps))
 app.add_handler(CommandHandler("agree", agree))
 app.add_handler(CommandHandler("disagree", disagree))
 app.add_handler(CommandHandler("run_continuous_commands", run_continuous_commands))
 app.add_handler(CommandHandler("start", start))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+
 app.run_polling()
