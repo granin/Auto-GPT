@@ -1,11 +1,19 @@
 import os
 import time
 import threading
+import datetime
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import asyncio
+
+
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
 input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
+
+def rename_old_session_files(file_path):
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    new_file_name = f"{file_path}_session_{timestamp}.txt"
+    os.rename(file_path, new_file_name)
 
 def get_file_mtime(filename):
     return os.stat(filename).st_mtime
@@ -16,6 +24,8 @@ def monitor_file_changes(context, bot_event_loop, start_event):
 
     last_mtime = None
     last_content = None
+    last_input_mtime = None
+    last_input_content = None
     user_input_expected = False
 
     # Wait for the start event to be set
@@ -40,9 +50,15 @@ def monitor_file_changes(context, bot_event_loop, start_event):
 
         # Check if input file is updated correctly
         if os.path.exists(input_filename):
-            with open(input_filename, "r") as input_file:
-                input_content = input_file.read()
-                print(f"Input file content: {input_content}")
+            current_input_mtime = get_file_mtime(input_filename)
+
+            if last_input_mtime is None or current_input_mtime != last_input_mtime:
+                with open(input_filename, "r") as input_file:
+                    input_content = input_file.read()
+                    if input_content != last_input_content and input_content.strip() != "":
+                        print(f"Input file content: {input_content}")
+                        last_input_content = input_content
+                        last_input_mtime = current_input_mtime
 
         time.sleep(0.5)
 
@@ -98,6 +114,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.message.chat_id
     await update.message.reply_text('Monitoring started')
 
+    # Rename old session files
+    if os.path.exists(output_filename):
+        rename_old_session_files(output_filename)
+    if os.path.exists(input_filename):
+        rename_old_session_files(input_filename)
+
+    # Create new empty files for the new session
+    open(output_filename, "w").close()
+    open(input_filename, "w").close()
+
     # Create the start event
     start_event = threading.Event()
     start_event.set()
@@ -105,6 +131,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     bot_event_loop = asyncio.get_event_loop()
     monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event))
     monitor_thread.start()
+
 
 app = ApplicationBuilder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
 app.add_handler(CommandHandler("hello", hello))
