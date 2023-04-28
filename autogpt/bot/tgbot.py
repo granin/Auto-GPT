@@ -1,13 +1,12 @@
 import os
 import time
 import threading
-import datetime
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import asyncio
 
 from capture_utils import get_human_feedback
-from bot import get_file_mtime, rename_old_session_files  # Add this import
+from bot import get_file_mtime, rename_old_session_files
 
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
 input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
@@ -15,14 +14,8 @@ input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 
 chat_id = None
 
 def monitor_file_changes(context, bot_event_loop, start_event):
-    output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
-    input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
-
     last_mtime = None
     last_content = None
-    last_input_mtime = None
-    last_input_content = None
-    user_input_expected = False
 
     # Wait for the start event to be set
     start_event.wait()
@@ -35,26 +28,9 @@ def monitor_file_changes(context, bot_event_loop, start_event):
                 with open(output_filename, "r") as f:
                     content = f.read()
                     if content != last_content and content.strip() != "":
-                        user_input_expected = on_output_file_updated(content, context, bot_event_loop)
+                        on_output_file_updated(content, context, bot_event_loop)
                         last_content = content
                         last_mtime = current_mtime
-                    else:
-                        user_input_expected = False
-
-        else:
-            last_mtime = None
-
-        # Check if input file is updated correctly
-        if os.path.exists(input_filename):
-            current_input_mtime = get_file_mtime(input_filename)
-
-            if last_input_mtime is None or current_input_mtime != last_input_mtime:
-                with open(input_filename, "r") as input_file:
-                    input_content = input_file.read()
-                    if input_content != last_input_content and input_content.strip() != "":
-                        print(f"Input file content: {input_content}")
-                        last_input_content = input_content
-                        last_input_mtime = current_input_mtime
 
         time.sleep(0.5)
 
@@ -66,16 +42,6 @@ def on_output_file_updated(content, context, bot_event_loop):
 
         future = asyncio.run_coroutine_threadsafe(send_message(), bot_event_loop)
         future.result()
-    return True
-
-
-
-def get_user_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    user_input = update.message.text.strip().lower()
-    return user_input
-
-def on_exit():
-    print("Stopped monitoring file.")
 
 async def agree(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     with open(input_filename, "w") as input_file:
@@ -88,7 +54,7 @@ async def disagree(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('Exit program')
 
 async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_input = get_user_input(update, context)
+    user_input = update.message.text.strip().lower()
     if user_input.startswith("y -"):
         try:
             num_commands = int(user_input.split(" ")[1])
@@ -97,7 +63,6 @@ async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_
             await update.message.reply_text(f'Running {num_commands} continuous commands')
         except ValueError:
             await update.message.reply_text('Invalid input format. Use "y -N" where N is the number of continuous commands')
-
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global chat_id
@@ -122,7 +87,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event))
     monitor_thread.start()
 
-
 app = Application.builder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
 app.add_handler(CommandHandler("agree", agree))
 app.add_handler(CommandHandler("disagree", disagree))
@@ -130,5 +94,5 @@ app.add_handler(CommandHandler("run_continuous_commands", run_continuous_command
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, get_human_feedback))
 
-
 app.run_polling()
+
