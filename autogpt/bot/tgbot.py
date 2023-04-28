@@ -10,13 +10,16 @@ input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 
 def get_file_mtime(filename):
     return os.stat(filename).st_mtime
 
-def monitor_file_changes(context, bot_event_loop):
+def monitor_file_changes(context, bot_event_loop, start_event):
     output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
     input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
 
     last_mtime = None
     last_content = None
     user_input_expected = False
+
+    # Wait for the start event to be set
+    start_event.wait()
 
     while True:
         if os.path.exists(output_filename):
@@ -35,6 +38,12 @@ def monitor_file_changes(context, bot_event_loop):
         else:
             last_mtime = None
 
+        # Check if input file is updated correctly
+        if os.path.exists(input_filename):
+            with open(input_filename, "r") as input_file:
+                input_content = input_file.read()
+                print(f"Input file content: {input_content}")
+
         time.sleep(0.5)
 
 def on_output_file_updated(content, context, bot_event_loop):
@@ -48,8 +57,10 @@ def on_output_file_updated(content, context, bot_event_loop):
     return True
 
 
-def get_user_input():
-    return "y"  # This will be replaced by the Telegram command
+
+def get_user_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    user_input = update.message.text.strip().lower()
+    return user_input
 
 def on_exit():
     print("Stopped monitoring file.")
@@ -65,6 +76,21 @@ async def agree(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 
+async def disagree(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    with open(input_filename, "w") as input_file:
+        input_file.write("n")
+    await update.message.reply_text('Exit program')
+
+async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_input = get_user_input(update, context)
+    if user_input.startswith("y -"):
+        try:
+            num_commands = int(user_input.split(" ")[1])
+            with open(input_filename, "w") as input_file:
+                input_file.write(f"y -{num_commands}")
+            await update.message.reply_text(f'Running {num_commands} continuous commands')
+        except ValueError:
+            await update.message.reply_text('Invalid input format. Use "y -N" where N is the number of continuous commands')
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -72,14 +98,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.message.chat_id
     await update.message.reply_text('Monitoring started')
 
+    # Create the start event
+    start_event = threading.Event()
+    start_event.set()
+
     bot_event_loop = asyncio.get_event_loop()
-    monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop))
+    monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event))
     monitor_thread.start()
-
-
 
 app = ApplicationBuilder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
 app.add_handler(CommandHandler("hello", hello))
 app.add_handler(CommandHandler("agree", agree))
+app.add_handler(CommandHandler("disagree", disagree))
+app.add_handler(CommandHandler("run_continuous_commands", run_continuous_commands))
 app.add_handler(CommandHandler("start", start))
 app.run_polling()
