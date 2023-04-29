@@ -6,4 +6,5 @@ then
     pip install -r requirements.txt
 fi
 python -m autogpt $@
+
 read -p "Press any key to continue..."

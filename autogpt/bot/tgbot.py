@@ -65,6 +65,12 @@ async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_
             await update.message.reply_text('Invalid input format. Use "y -N" where N is the number of continuous commands')
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    my_user_id = 37252140  # Replace with your Telegram user ID
+
+    if update.message.from_user.id != my_user_id:
+        await update.message.reply_text("Unauthorized access. This bot is for private use only.")
+        return
+
     global chat_id
     chat_id = update.message.chat_id
     await update.message.reply_text('Monitoring started')
