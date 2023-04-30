@@ -63,6 +63,20 @@ async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_
             await update.message.reply_text(f'Running {num_commands} continuous commands')
         except ValueError:
             await update.message.reply_text('Invalid input format. Use "y -N" where N is the number of continuous commands')
+async def set_ai_config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    input_text = update.message.text.strip()
+    if len(input_text.split("\n")) < 3:
+        await update.message.reply_text("Please provide the AI's name, role, and goals separated by new lines.")
+        return
+
+    ai_name, ai_role, *ai_goals = input_text.split("\n")
+    ai_config = AIConfig(ai_name, ai_role, ai_goals)
+
+    config_filename = "ai_config.txt"
+    with open(config_filename, "w") as config_file:
+        config_file.write(f"{ai_name}\n{ai_role}\n{'|'.join(ai_goals)}")
+
+    await update.message.reply_text(f"AI configuration saved:\n{ai_config}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     my_user_id = 37252140  # Replace with your Telegram user ID
