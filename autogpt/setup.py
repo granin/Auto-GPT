@@ -5,6 +5,20 @@ from autogpt import utils
 from autogpt.config.ai_config import AIConfig
 from autogpt.logs import logger
 
+def load_ai_config_from_file(file_path: str) -> AIConfig:
+    with open(file_path, 'r') as f:
+        data = yaml.safe_load(f)
+
+    ai_name = data.get('ai_name', 'Entrepreneur-GPT')
+    ai_role = data.get('ai_role', 'an AI designed to autonomously develop and run businesses with the'
+                                  ' sole goal of increasing your net worth.')
+    ai_goals = data.get('ai_goals', [
+        "Increase net worth",
+        "Grow Twitter Account",
+        "Develop and manage multiple businesses autonomously",
+    ])
+
+    return AIConfig(ai_name, ai_role, ai_goals)
 
 def prompt_user() -> AIConfig:
     """Prompt the user for input

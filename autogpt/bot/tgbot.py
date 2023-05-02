@@ -4,9 +4,19 @@ import threading
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import asyncio
+import yaml
 
 from capture_utils import get_human_feedback
 from bot import get_file_mtime, rename_old_session_files
+import subprocess
+async def start_autogpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    ai_settings_path = "path/to/your/ai_settings.yaml"
+    result = subprocess.run(["python", "cli.py", "--ai-settings", ai_settings_path], capture_output=True)
+    output = result.stdout.decode("utf-8").strip()
+    if output:
+        await update.message.reply_text(output)
+    else:
+        await update.message.reply_text("The Auto-GPT process completed, but there was no output.")
 
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
 input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
@@ -64,19 +74,20 @@ async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_
         except ValueError:
             await update.message.reply_text('Invalid input format. Use "y -N" where N is the number of continuous commands')
 async def set_ai_config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    input_text = update.message.text.strip()
-    if len(input_text.split("\n")) < 3:
-        await update.message.reply_text("Please provide the AI's name, role, and goals separated by new lines.")
-        return
+    global ai_config_values
+    message_text = update.message.text
+    _, name, role, *goals = message_text.split('|')
 
-    ai_name, ai_role, *ai_goals = input_text.split("\n")
-    ai_config = AIConfig(ai_name, ai_role, ai_goals)
+    ai_config_values = {
+        'name': name.strip(),
+        'role': role.strip(),
+        'goals': [goal.strip() for goal in goals]
+    }
 
-    config_filename = "ai_config.txt"
-    with open(config_filename, "w") as config_file:
-        config_file.write(f"{ai_name}\n{ai_role}\n{'|'.join(ai_goals)}")
-
-    await update.message.reply_text(f"AI configuration saved:\n{ai_config}")
+    await update.message.reply_text(f"AI config set successfully:\n"
+                                    f"Name: {name}\n"
+                                    f"Role: {role}\n"
+                                    f"Goals: {', '.join(goals)}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     my_user_id = 37252140  # Replace with your Telegram user ID
@@ -113,6 +124,8 @@ app.add_handler(CommandHandler("disagree", disagree))
 app.add_handler(CommandHandler("run_continuous_commands", run_continuous_commands))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, get_human_feedback))
+app.add_handler(CommandHandler("set_ai_config", set_ai_config))
+app.add_handler(CommandHandler("start_autogpt", start_autogpt))
 
 app.run_polling()
 
