@@ -9,14 +9,36 @@ import yaml
 from capture_utils import get_human_feedback
 from bot import get_file_mtime, rename_old_session_files
 import subprocess
+
+def write_custom_ai_settings() -> str:
+    custom_ai_settings = {
+        "ai_name": ai_config_values["name"],
+        "ai_role": ai_config_values["role"],
+        "ai_goals": ai_config_values["goals"]
+    }
+    custom_ai_settings_file = "ai_settings_custom.yaml"
+    with open(custom_ai_settings_file, "w") as f:
+        yaml.dump(custom_ai_settings, f)
+    return custom_ai_settings_file
+
+import os
+import platform
+
 async def start_autogpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    ai_settings_path = "path/to/your/ai_settings.yaml"
-    result = subprocess.run(["python", "cli.py", "--ai-settings", ai_settings_path], capture_output=True)
-    output = result.stdout.decode("utf-8").strip()
-    if output:
-        await update.message.reply_text(output)
+    if not ai_config_values:
+        await update.message.reply_text("AI configuration is not set. Please use /set_ai_config command to set the AI configuration.")
+        return
+
+    ai_settings_path = write_custom_ai_settings()
+    cli_path = "/Users/m/git/1ai/Auto-GPT/autogpt/cli.py"
+    command = f"python {cli_path} --ai-settings {ai_settings_path}"
+
+    system = platform.system()
+    if system == "Darwin" or system == "Linux":
+        os.system(f"gnome-terminal -- bash -c '{command}; exec bash'" if system == "Linux" else f"osascript -e 'tell application \"Terminal\" to do script \"{command}\"'")
+        await update.message.reply_text("Auto-GPT process started in a new terminal.")
     else:
-        await update.message.reply_text("The Auto-GPT process completed, but there was no output.")
+        await update.message.reply_text(f"Unsupported platform. Run the following command in a separate terminal:\n\n{command}")
 
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
 input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
