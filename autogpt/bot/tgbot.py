@@ -10,20 +10,20 @@ from capture_utils import get_human_feedback
 from bot import get_file_mtime, rename_old_session_files
 import subprocess
 
-def write_custom_ai_settings():
-    ai_settings_custom = {
+def write_ai_settings():
+    ai_settings = {
         "ai_name": "AI Name",
         "ai_role": "AI Role",
         "ai_goals": ["Goal 1", "Goal 2", "Goal 3"],
     }
 
-    ai_settings_path = "ai_settings_custom.yaml"
+    ai_settings_path = "/Users/m/git/1ai/Auto-GPT/ai_settings.yaml"
 
     with open(ai_settings_path, "w") as outfile:
-        outfile.write("ai_name: {}\n".format(ai_settings_custom["ai_name"]))
-        outfile.write("ai_role: {}\n".format(ai_settings_custom["ai_role"]))
+        outfile.write("ai_name: {}\n".format(ai_settings["ai_name"]))
+        outfile.write("ai_role: {}\n".format(ai_settings["ai_role"]))
         outfile.write("ai_goals:\n")
-        for goal in ai_settings_custom["ai_goals"]:
+        for goal in ai_settings["ai_goals"]:
             outfile.write("- '{}'\n".format(goal))
 
     return ai_settings_path
@@ -38,10 +38,7 @@ async def start_autogpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("AI configuration is not set. Please use /set_ai_config command to set the AI configuration.")
         return
 
-    ai_settings_filename = "ai_settings_custom.yaml"
-    ai_settings_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'ai_settings_custom.yaml')
-
-    write_custom_ai_settings()
+    ai_settings_path = write_ai_settings()
 
     run_sh_path = "/Users/m/git/1ai/Auto-GPT/run.sh"
     script_dir = os.path.dirname(run_sh_path)
@@ -57,6 +54,7 @@ async def start_autogpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 output_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Assistant_Reply.txt')
 input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Processed_Input.txt')
 
+global chat_id
 chat_id = None
 
 def monitor_file_changes(context, bot_event_loop, start_event):
@@ -109,11 +107,11 @@ async def run_continuous_commands(update: Update, context: ContextTypes.DEFAULT_
             await update.message.reply_text(f'Running {num_commands} continuous commands')
         except ValueError:
             await update.message.reply_text('Invalid input format. Use "y -N" where N is the number of continuous commands')
+
 async def set_ai_config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global ai_config_values
     message_text = update.message.text
     _, name, role, *goals = message_text.split('|')
-
     ai_config_values = {
         'name': name.strip(),
         'role': role.strip(),
@@ -126,12 +124,6 @@ async def set_ai_config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                                     f"Goals: {', '.join(goals)}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    my_user_id = 37252140  # Replace with your Telegram user ID
-
-    if update.message.from_user.id != my_user_id:
-        await update.message.reply_text("Unauthorized access. This bot is for private use only.")
-        return
-
     global chat_id
     chat_id = update.message.chat_id
     await update.message.reply_text('Monitoring started')
@@ -152,7 +144,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     bot_event_loop = asyncio.get_event_loop()
     monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event))
-    monitor_threl triead.start()
+    monitor_thread.start()
 
 app = Application.builder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
 app.add_handler(CommandHandler("agree", agree))
@@ -164,4 +156,3 @@ app.add_handler(CommandHandler("set_ai_config", set_ai_config))
 app.add_handler(CommandHandler("start_autogpt", start_autogpt))
 
 app.run_polling()
-
