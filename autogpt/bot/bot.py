@@ -1,6 +1,7 @@
 # bot.py
 
 import os
+import shutil
 import time
 import datetime
 
@@ -10,7 +11,7 @@ def get_file_mtime(filename):
 def rename_old_session_files(file_path):
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     new_file_name = f"{file_path}_session_{timestamp}.txt"
-    os.rename(file_path, new_file_name)
+    shutil.move(file_path, new_file_name)
 
 def run_bot(output_filename, input_filename, on_output_file_updated, get_user_input, process_input, on_exit):
     last_mtime = None
