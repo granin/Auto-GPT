@@ -4,7 +4,7 @@ import os
 import time
 import threading
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, Updater
 import asyncio
 from bot import write_ai_settings, get_file_mtime, rename_old_session_files
 from capture_utils import get_human_feedback
@@ -12,6 +12,7 @@ import subprocess
 ai_config_values = None
 
 async def start_autogpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.effective_user.id
     ai_settings_path = "/Users/m/git/1ai/Auto-GPT/autogpt/bot/ai_settings_custom.yaml"
     #
     if not os.path.exists(ai_settings_path):
@@ -34,8 +35,7 @@ input_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 
 
 global chat_id
 chat_id = None
-
-def monitor_file_changes(context, bot_event_loop, start_event):
+def monitor_file_changes(context, bot_event_loop, start_event, user_id: int):
     last_mtime = None
     last_content = None
 
@@ -56,7 +56,8 @@ def monitor_file_changes(context, bot_event_loop, start_event):
 
         time.sleep(0.5)
 
-def on_output_file_updated(content, context, bot_event_loop):
+def on_output_file_updated(content, context, bot_event_loop, user_id: int):
+
     global chat_id
     if chat_id:
         async def send_message():
@@ -91,10 +92,6 @@ async def set_ai_config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                                     f"Goals: {', '.join(goals)}")
 async def restart_autogpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global ai_config_values
-
-    # if ai_config_values is None:
-    #     await update.message.reply_text("AI configuration is not set. Please use /set_ai_config or /start_all command to set the AI configuration.")
-    #     return
 
     # Write AI settings to file
     ai_settings_path = write_ai_settings(ai_config_values)
@@ -145,6 +142,7 @@ async def start_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Start monitoring
     global chat_id
     chat_id = update.message.chat_id
+    user_id = chat_id
     await update.message.reply_text('Monitoring started')
 
     # Rename old session files
@@ -162,7 +160,7 @@ async def start_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     start_event.set()
 
     bot_event_loop = asyncio.get_event_loop()
-    monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event))
+    monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event, user_id))
     monitor_thread.start()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -189,6 +187,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     monitor_thread.start()
 
 app = Application.builder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
+
 app.add_handler(CommandHandler("agree", agree))
 app.add_handler(CommandHandler("disagree", disagree))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, get_human_feedback))
