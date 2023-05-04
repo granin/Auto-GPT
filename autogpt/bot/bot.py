@@ -1,12 +1,25 @@
-# bot.py
+#  Auto-GPT/autogpt/bot/bot.py
 
-import os
 import shutil
-import time
 import datetime
+import os
+import time
 
-def get_file_mtime(filename):
-    return os.stat(filename).st_mtime
+
+def get_file_mtime(file_path):
+    return os.path.getmtime(file_path)
+
+def write_ai_settings(ai_config_values):
+    ai_settings_path = "/Users/m/git/1ai/Auto-GPT/ai_settings.yaml"
+
+    with open(ai_settings_path, "w") as outfile:
+        outfile.write("ai_name: {}\n".format(ai_config_values["name"]))
+        outfile.write("ai_role: {}\n".format(ai_config_values["role"]))
+        outfile.write("ai_goals:\n")
+        for goal in ai_config_values["goals"]:
+            outfile.write("- '{}'\n".format(goal))
+
+    return ai_settings_path
 
 def rename_old_session_files(file_path):
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
