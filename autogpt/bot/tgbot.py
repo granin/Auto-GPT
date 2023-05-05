@@ -50,7 +50,7 @@ def monitor_file_changes(context, bot_event_loop, start_event, user_id: int):
                 with open(output_filename, "r") as f:
                     content = f.read()
                     if content != last_content and content.strip() != "":
-                        on_output_file_updated(content, context, bot_event_loop)
+                        on_output_file_updated(content, context, bot_event_loop, user_id)
                         last_content = content
                         last_mtime = current_mtime
 
@@ -183,7 +183,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     start_event.set()
 
     bot_event_loop = asyncio.get_event_loop()
-    monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event))
+    monitor_thread = threading.Thread(target=monitor_file_changes, args=(context, bot_event_loop, start_event, user_id))
     monitor_thread.start()
 
 app = Application.builder().token("6253259092:AAG6bPFPOEbo5WOcTcXrbs-S_RwtZBM7jKQ").build()
